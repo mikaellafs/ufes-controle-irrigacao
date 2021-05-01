@@ -1,7 +1,7 @@
 # T2-interfaces-perifericos
 Controle de Irrigação
 
-# Pré-requisitos para execução
+## Pré-requisitos para execução
 
 Para executar os códigos, é necessário baixar a biblioteca [PubSubClient](https://github.com/knolleary/pubsubclient/archive/master.zip), que realiza a funcionalidade Publisher/Subscriber do protocolo MQTT. 
 
