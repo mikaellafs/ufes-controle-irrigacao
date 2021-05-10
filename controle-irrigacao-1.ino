@@ -9,10 +9,10 @@ const char* password = "";
 const char* server = "mqtt.thingspeak.com";
 
 //Topic para envio de dados para um canal e multiplos fields de forma geral
-//Substitua <channelID> e <channelAPI> pelo id e pelo API Key do canal criado, respectivamente
+//topic = “channels/<channelID>/publish/<writeAPIKey
 const char* topic="channels/1377002/publish/IIKNQ8UH34M6ZAEK";
 
-// Inicializa o ESP8266 como cliente
+// Inicializa o ESP32 como cliente
 WiFiClient espClient;
 PubSubClient client(server, 1883, espClient);
 
@@ -41,13 +41,13 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Tentando conexão MQTT...");
     
-    if (client.connect("iotufes")) {
+    if (client.connect("ip1ufes")) {
       Serial.println("conectado");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
+      Serial.println(" Tente novamente em 5 segundos");
+      // Espera 5 segundos para tentar novamente
       delay(5000);
     }
   }
@@ -56,7 +56,7 @@ void reconnect() {
 // Envia o dado para o thingspeak através do protocolo MQTT
 void publishData(String payload){
   if (client.connected()){
-    Serial.print("Sending payload: ");
+    Serial.print("Enviando payload: ");
     Serial.println(payload);
     
     if (client.publish(topic, (char*) payload.c_str())) {
@@ -71,9 +71,13 @@ void publishData(String payload){
 // Função que lê os dados do higrometro e retorna % de umidade
 float readHIG(){
   float nvlUmidade;
-  int value= analogRead(higPin);// le faixa de valores de 0 - 1024 (0 extremamente umido- 1024 extremamente seco)
-  nvlUmidade = ( 100.00 - ( (value/1023.00) * 100.00 ) ); //nivel de umidade em porcentagem
-    
+  int value= analogRead(higPin);// le faixa de valores de 0 - 4096 (0 extremamente umido- 4096 extremamente seco)
+  nvlUmidade = ( 100.00 - ( (value/4095.00) * 100.00 ) ); //nivel de umidade em porcentagem
+
+  Serial.print("Umidade lida: ");
+  Serial.print(nvlUmidade);
+  Serial.println("%");
+ 
   return nvlUmidade;
 }
 
@@ -98,10 +102,11 @@ void loop() {
     reconnect();
   }
   if(!client.loop())
-    client.connect("iotufes");
+    client.connect("ip1ufes");
 
   //Envia a umidade lida
+
   publishData(geraPayload());
 
-  delay(2000); //Espera 2 segundos para proxima leitura
+  delay(4000); //Espera 5 segundos para proxima leitura
 }
